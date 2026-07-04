@@ -1,10 +1,17 @@
 # Setup
 
-This repo is a companion layer on top of [whatsapp-mcp](https://github.com/verygoodplugins/whatsapp-mcp):
-a setup script, a launchd service, and a Claude Desktop Project configuration
-that turns the raw WhatsApp MCP tools into a Classify / Digest / Act
-assistant. See [`docs/superpowers/specs/2026-07-04-whatsapp-assistant-design.md`](docs/superpowers/specs/2026-07-04-whatsapp-assistant-design.md)
+This repo bundles [whatsapp-mcp](https://github.com/verygoodplugins/whatsapp-mcp)
+(vendored under `whatsapp-mcp/`) together with a setup script, a launchd
+service, and a Claude Desktop Project configuration that turns the raw
+WhatsApp MCP tools into a Classify / Digest / Act assistant. Everything is in
+this one repo — a single `git clone` gets all of it. See
+[`docs/superpowers/specs/2026-07-04-whatsapp-assistant-design.md`](docs/superpowers/specs/2026-07-04-whatsapp-assistant-design.md)
 for the design behind this.
+
+> The `whatsapp-mcp/` code is vendored (copied in), not a git submodule or
+> live clone — it won't pick up upstream updates via `git pull`. To update it,
+> re-fetch upstream and copy over `whatsapp-bridge/` and
+> `whatsapp-mcp-server/` by hand (see "Updating" below).
 
 Two people may be involved: an **operator** (technical, does most of this)
 and an **end user** (only does the steps marked 🙋).
@@ -16,14 +23,14 @@ and an **end user** (only does the steps marked 🙋).
 - Claude Desktop
 - (optional, for sending/converting voice notes) `ffmpeg` — `brew install ffmpeg`
 
-## 1. Clone whatsapp-mcp into this repo
+## 1. Clone this repo
 
 ```bash
-git clone https://github.com/verygoodplugins/whatsapp-mcp.git
+git clone <this-repo-url>
+cd <this-repo>
 ```
 
-Run from the root of this repo — it clones into `whatsapp-mcp/`, which this
-repo's `.gitignore` intentionally excludes (it's upstream's repo, not ours).
+That's it — `whatsapp-mcp/` is already in here.
 
 ## 2. First run — pair with WhatsApp (🙋 needs the end user's phone)
 
@@ -40,17 +47,20 @@ off to a background service.
 ## 3. Install the bridge as a background service (operator)
 
 ```bash
-cd ../..   # back to this repo's root
-./scripts/install-bridge-service.sh
+cd ..   # back to whatsapp-mcp/
+./scripts/install-launchd-macos.sh
 ```
 
-This builds a binary and installs a launchd job so the bridge restarts
-automatically on login/crash, with no terminal required afterward.
+This is upstream's own installer: it builds the bridge binary, installs a
+launchd job so it restarts automatically on login/crash, and installs a
+second launchd job that checks bridge health every 60s and sends a macOS
+notification if it goes down or needs re-linking. No terminal required
+afterward. To remove both later: `./scripts/uninstall-launchd-macos.sh`.
 
 Verify:
 ```bash
-launchctl list | grep com.whatsapp.bridge   # should show a PID, not "-"
-tail -20 logs/bridge.log                     # should show connected/ready, no crash loop
+launchctl list | grep com.whatsapp-mcp   # both bridge and bridge-monitor should show a PID
+tail -20 ~/Library/Logs/whatsapp-mcp/bridge.out.log   # should show connected/ready, no crash loop
 ```
 
 ## 4. Configure Claude Desktop (operator, or 🙋 if comfortable pasting JSON)
@@ -99,21 +109,20 @@ things like "what's new today" or "help me reply to Priya" — see
 
 ## Updating
 
+`whatsapp-mcp/` is vendored, so there's no `git pull` inside it. To pick up
+upstream changes: clone upstream separately, diff/copy over
+`whatsapp-bridge/` and `whatsapp-mcp-server/`, then rebuild and restart the
+service from `whatsapp-mcp/`:
 ```bash
-cd whatsapp-mcp && git pull
-```
-
-If you changed bridge code and are running the built binary (not `go run .`),
-rebuild and restart the service:
-```bash
-./scripts/install-bridge-service.sh
+./scripts/install-launchd-macos.sh
 ```
 
 ## Troubleshooting
 
 | Symptom | Check |
 |---|---|
-| Claude Desktop says it can't reach WhatsApp tools | `launchctl list \| grep com.whatsapp.bridge` — is it running? |
-| Bridge keeps restarting in a loop | `tail -50 logs/bridge.error.log` |
+| Claude Desktop says it can't reach WhatsApp tools | `launchctl list \| grep com.whatsapp-mcp` — is `com.whatsapp-mcp.bridge` running? |
+| Bridge keeps restarting in a loop | `tail -50 ~/Library/Logs/whatsapp-mcp/bridge.err.log` |
+| Bridge down or needs re-linking | Check for a macOS notification from the monitor job, or `tail ~/Library/Logs/whatsapp-mcp/monitor.err.log` |
 | QR code needed again | Usually means the paired session was invalidated on the phone side (device unlinked). Run step 2 again. |
 | Chats missing from a Digest | Check they're not accidentally listed under "Ignore" in the classification file |

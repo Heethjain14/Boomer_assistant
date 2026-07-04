@@ -3,7 +3,6 @@
 
 # Logs
 *.log
-logs/
 
 # Config
 claude_desktop_config.json
@@ -20,12 +19,12 @@ node_modules/
 package-lock.json
 
 # Go binaries
-whatsapp-mcp/whatsapp-bridge/whatsapp-bridge
-whatsapp-mcp/whatsapp-bridge/whatsapp-client
+whatsapp-bridge/whatsapp-bridge
+whatsapp-bridge/whatsapp-client
 *.exe
 
 # WhatsApp data (personal/sensitive)
-whatsapp-mcp/whatsapp-bridge/store/
+whatsapp-bridge/store/
 
 # Python
 __pycache__/
@@ -53,3 +52,4 @@ build/
 .pytest_cache/
 .coverage
 htmlcov/
+/store
