@@ -95,17 +95,42 @@ point works without this.
 1. Create a new Project in Claude Desktop.
 2. Paste the contents of [`docs/whatsapp-project-instructions.md`](docs/whatsapp-project-instructions.md)
    (everything after the `---`) into the Project's custom instructions.
-3. Add [`docs/whatsapp-classification.md`](docs/whatsapp-classification.md) as
-   a knowledge file in the Project.
+3. Add all three of these as knowledge files in the Project:
+   - [`docs/whatsapp-profile.md`](docs/whatsapp-profile.md)
+   - [`docs/whatsapp-classification.md`](docs/whatsapp-classification.md)
+   - [`docs/whatsapp-reminders.md`](docs/whatsapp-reminders.md)
+4. Turn on Memory for the Project: Settings → Capabilities → Memory. Without
+   this, the assistant won't build up behavioral notes over time.
 
 ## 7. First conversation (🙋 end user, in the new Project)
 
-Just start talking naturally — e.g. "help me set up my chat categories."
-Claude will walk through classifying chats as Work / Personal / Ignore /
-High priority and hand back an updated version of the classification file for
-you to paste back into the Project's knowledge file. From then on, ask for
-things like "what's new today" or "help me reply to Priya" — see
-`docs/whatsapp-project-instructions.md` for the full behavior.
+Just say "set me up." The assistant runs a one-time guided interview — who you
+are, working hours, languages, reply style, which chats it may read, and your
+morning routine — then hands back filled-in versions of the knowledge files.
+**Paste each one back into the Project as the replacement knowledge file to
+save it** (the assistant will remind you; nothing saves on its own).
+
+From then on, just talk: "what's new today," "help me reply to Yash," "remind
+me to call Jiju Friday," "mute the Nifty group for a week," "am I set up
+right." See `docs/whatsapp-project-instructions.md` for everything it can do.
+
+## Autorun (how the background service behaves)
+
+After step 3, the bridge runs as a launchd service:
+- **Close the lid / sleep:** keeps running, resumes on wake.
+- **Shut down / restart:** auto-starts again when you log in.
+- **Crash:** restarts itself.
+
+To **disable** auto-start: `cd whatsapp-mcp && ./scripts/uninstall-launchd-macos.sh`.
+To **re-enable**: `./scripts/install-launchd-macos.sh`. You can also just ask
+the assistant ("turn off morning auto-start") and it'll give you the command.
+
+## Hands-free morning digest (optional, later phase)
+
+The design includes a scheduler add-on that runs your morning briefing on a
+timer and can even send it to your own WhatsApp number, without opening Claude.
+It's not part of core setup — see the "Scheduler add-on" section of
+[`docs/superpowers/specs/2026-07-04-whatsapp-assistant-v2-design.md`](docs/superpowers/specs/2026-07-04-whatsapp-assistant-v2-design.md).
 
 ## Updating
 
@@ -125,4 +150,5 @@ service from `whatsapp-mcp/`:
 | Bridge keeps restarting in a loop | `tail -50 ~/Library/Logs/whatsapp-mcp/bridge.err.log` |
 | Bridge down or needs re-linking | Check for a macOS notification from the monitor job, or `tail ~/Library/Logs/whatsapp-mcp/monitor.err.log` |
 | QR code needed again | Usually means the paired session was invalidated on the phone side (device unlinked). Run step 2 again. |
-| Chats missing from a Digest | Check they're not accidentally listed under "Ignore" in the classification file |
+| Chats missing from a Digest | Check they're on the "Allowed chats" list, and not muted/snoozed in the reminders file |
+| Assistant forgot my settings | The knowledge files only update when you paste the assistant's new version back in — check you did that after the last change |

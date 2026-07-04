@@ -1,28 +1,30 @@
 # WhatsApp Chat Classification
 
-Paste this into the Claude Desktop Project as a knowledge file.
+Knowledge file for the Claude Desktop Project. Tracks which chats the assistant
+may read and how they're categorized.
 
-**This file only updates one way: Claude hands you back the full new version of
-this file in chat, and you paste that whole thing back in as the replacement
-knowledge file.** Nothing saves automatically — if you close the chat without
-pasting an updated version back in, whatever Claude told you gets lost. Claude
-should remind you of this every time it changes.
+**Saving:** the assistant only ever *hands you back* the full new version of this
+file — paste that whole thing in as the replacement knowledge file. Nothing
+saves on its own; if you close the chat without pasting it back, changes are
+lost. The assistant will remind you every time.
 
 ## Allowed chats
 
-Set once, at first-time setup. This is the *only* thing that matters for
-whether Claude can see a chat at all — everything not listed here is off
-limits by default, full stop, even if you ask generically ("summarize
-everything"). To add a chat later, just tell Claude and it'll add it here.
+Set at first-time setup, extendable anytime. This is the **only** thing that
+decides whether the assistant can see a chat at all — anything not listed here
+is off limits by default, even for generic requests ("summarize everything").
+Add a chat later just by asking.
 
-<!-- e.g. "Mom", "TraceX - All - Employees", "Yash" -->
+Format: `- Chat name · last_digested: <ISO timestamp or "never">`
+
+<!-- - Mom · last_digested: never -->
+<!-- - TraceX - All - Employees · last_digested: never -->
 
 ## Classified
 
-Nothing here at first. The *first time* an allowed chat actually comes up in a
-Digest or Act request, Claude pauses, asks you a couple of quick questions
-about that one chat (Work or personal? High priority?), and adds it below.
-After that, it's remembered — you're never asked about the same chat twice.
+Empty at first. The **first time** an allowed chat actually comes up in a Digest
+or Act request, the assistant asks a couple of quick questions about that one
+chat and records it below. You're never asked about the same chat twice.
 
 ### Work
 
@@ -38,4 +40,4 @@ After that, it's remembered — you're never asked about the same chat twice.
 
 ## Notes
 
-<!-- Anything else Claude should know, e.g. "Digest should default to Work chats only on weekdays" -->
+<!-- e.g. "Digest should default to Work chats only on weekdays" -->
