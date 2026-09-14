@@ -10,25 +10,25 @@ its own.
 
 ## About me
 
-- Name:
-- Role / what I do:
-- Timezone:
-- Working hours:
-- Languages I use in chats: <!-- e.g. English, Hindi, Gujarati - so drafts match -->
+- Name: Vijval
+- Role / what I do: TraceX Technologies
+- Timezone: Asia/Calcutta (IST)
+- Working hours: 9 AM – 6 PM
+- Languages I use in chats: English, Hindi
 
 ## Reply style
 
-- Default tone: <!-- casual / formal / depends on chat -->
-- Default length: <!-- short and direct / fuller -->
-- Things to always do: <!-- e.g. "greet by first name", "no emoji in work replies" -->
-- Things to never do:
+- Default tone: Casual
+- Default length: short and direct
+- Things to always do: match tone of the chat, keep it casual
+- Things to never do: use emoji in work-related replies (e.g. TraceX chats)
 
 ## Morning routine
 
-- What my digest should include by default: <!-- e.g. Work chats + reminders, skip personal on weekdays -->
-- When my "day" starts: <!-- e.g. 8am -->
-- Weekday vs weekend difference:
-- Anything I always want flagged:
+- What my digest should include by default: everything on the allowed-chats list (no filtering by category)
+- When my "day" starts: 7 AM
+- Weekday vs weekend difference: none specified yet
+- Anything I always want flagged: none specified yet
 
 ## Notes
 

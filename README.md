@@ -24,6 +24,10 @@ raw tools into an end-to-end assistant.
   mute a noisy group, all by just asking.
 - **Runs itself** — the background bridge auto-starts on login and survives
   sleep/restart; disable it anytime with one command.
+- **Self-healing reconnect** — if the bridge stalls or WhatsApp logs it out,
+  just ask ("reconnect my whatsapp") and Claude restarts the service and walks
+  you through re-pairing, QR code included. See
+  [`docs/whatsapp-bridge-reconnect.md`](docs/whatsapp-bridge-reconnect.md).
 
 ## How it's built
 
@@ -31,10 +35,13 @@ raw tools into an end-to-end assistant.
 |---|---|
 | `whatsapp-mcp/` | vendored bridge (Go) + MCP server (Python) — talks to WhatsApp |
 | `whatsapp-mcp/scripts/install-launchd-macos.sh` | makes the bridge auto-start persistently |
+| `whatsapp-mcp/scripts/uninstall-launchd-macos.sh` | stops the auto-start service |
+| `whatsapp-mcp/scripts/reconnect-bridge.sh` | one-command restart when the bridge looks stuck (stale messages) |
 | `docs/whatsapp-project-instructions.md` | the assistant's behavior (paste into a Claude Desktop Project) |
 | `docs/whatsapp-profile.md` | who you are + preferences (Project knowledge file) |
 | `docs/whatsapp-classification.md` | allowed chats + categories + last-digested (knowledge file) |
 | `docs/whatsapp-reminders.md` | reminders, follow-ups, dates (knowledge file) |
+| `docs/whatsapp-bridge-reconnect.md` | runbook for reconnecting the bridge, manually or via Claude |
 
 Design details: [`docs/superpowers/specs/2026-07-04-whatsapp-assistant-v2-design.md`](docs/superpowers/specs/2026-07-04-whatsapp-assistant-v2-design.md).
 
@@ -42,6 +49,23 @@ Design details: [`docs/superpowers/specs/2026-07-04-whatsapp-assistant-v2-design
 
 See [SETUP.md](SETUP.md) — clone, pair WhatsApp once (QR code), install the
 background service, point Claude Desktop at it, and create the Project.
+
+## Reconnecting the bridge
+
+If your assistant's data looks stale (messages days/weeks old when they
+shouldn't be), the background bridge has either stopped or gotten logged out.
+Two ways to fix it:
+
+1. **Do it yourself:** `cd whatsapp-mcp && ./scripts/reconnect-bridge.sh`, then
+   re-pair via QR if prompted (see the script's own comments, or the runbook
+   below).
+2. **Ask Claude:** just say "reconnect my whatsapp" in the Project chat — it
+   restarts the service and, if a fresh QR pairing is needed, generates and
+   sends you a scannable QR code image directly in the conversation.
+
+Full details, including exactly how Claude does step 2 (useful if you're
+setting this up on another machine or debugging it yourself): see
+[`docs/whatsapp-bridge-reconnect.md`](docs/whatsapp-bridge-reconnect.md).
 
 ## Security
 
