@@ -34,9 +34,12 @@ raw tools into an end-to-end assistant.
 | Piece | What it is |
 |---|---|
 | `whatsapp-mcp/` | vendored bridge (Go) + MCP server (Python) — talks to WhatsApp |
-| `whatsapp-mcp/scripts/install-launchd-macos.sh` | makes the bridge auto-start persistently |
-| `whatsapp-mcp/scripts/uninstall-launchd-macos.sh` | stops the auto-start service |
-| `whatsapp-mcp/scripts/reconnect-bridge.sh` | one-command restart when the bridge looks stuck (stale messages) |
+| `whatsapp-mcp/scripts/install-launchd-macos.sh` | (macOS) makes the bridge auto-start persistently |
+| `whatsapp-mcp/scripts/uninstall-launchd-macos.sh` | (macOS) stops the auto-start service |
+| `whatsapp-mcp/scripts/reconnect-bridge.sh` | (macOS) one-command restart when the bridge looks stuck (stale messages) |
+| `whatsapp-mcp/scripts/install-windows.ps1` | (Windows) makes the bridge auto-start persistently, via Scheduled Tasks |
+| `whatsapp-mcp/scripts/uninstall-windows.ps1` | (Windows) stops the auto-start Scheduled Tasks |
+| `whatsapp-mcp/scripts/reconnect-bridge.ps1` | (Windows) one-command restart when the bridge looks stuck (stale messages) |
 | `docs/whatsapp-project-instructions.md` | the assistant's behavior (paste into a Claude Desktop Project) |
 | `docs/whatsapp-profile.md` | who you are + preferences (Project knowledge file) |
 | `docs/whatsapp-classification.md` | allowed chats + categories + last-digested (knowledge file) |
@@ -56,9 +59,10 @@ If your assistant's data looks stale (messages days/weeks old when they
 shouldn't be), the background bridge has either stopped or gotten logged out.
 Two ways to fix it:
 
-1. **Do it yourself:** `cd whatsapp-mcp && ./scripts/reconnect-bridge.sh`, then
-   re-pair via QR if prompted (see the script's own comments, or the runbook
-   below).
+1. **Do it yourself:** `cd whatsapp-mcp && ./scripts/reconnect-bridge.sh` (macOS)
+   or `cd whatsapp-mcp && powershell -File scripts\reconnect-bridge.ps1` (Windows),
+   then re-pair via QR if prompted (see the script's own comments, or the
+   runbook below).
 2. **Ask Claude:** just say "reconnect my whatsapp" in the Project chat — it
    restarts the service and, if a fresh QR pairing is needed, generates and
    sends you a scannable QR code image directly in the conversation.
