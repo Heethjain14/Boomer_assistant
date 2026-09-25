@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"math"
@@ -1291,10 +1292,18 @@ func sendWhatsAppMessage(client *whatsmeow.Client, messageStore *MessageStore, r
 		applyChatEphemeralSettings(msg, settings)
 	}
 
-	// Send message
-	resp, err := client.SendMessage(context.Background(), recipientJID, msg)
+	// Send message. whatsmeow blocks until the server acks the send; without
+	// a deadline a stalled connection hangs this call (and every caller
+	// waiting on it — the HTTP handler, then the MCP server's HTTP client)
+	// forever, surfacing to the end user only as a silent multi-minute hang.
+	sendCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	resp, err := client.SendMessage(sendCtx, recipientJID, msg)
 
 	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return false, "Timed out waiting for WhatsApp to acknowledge the message (30s). The connection may be degraded — try again or reconnect the bridge."
+		}
 		return false, fmt.Sprintf("Error sending message: %v", err)
 	}
 
@@ -2076,7 +2085,9 @@ func newRESTMux(client *whatsmeow.Client, messageStore *MessageStore, port int, 
 		}
 		msg := client.BuildReaction(chatJID, senderJID, req.MessageID, *req.Emoji)
 		w.Header().Set("Content-Type", "application/json")
-		if _, err := client.SendMessage(context.Background(), chatJID, msg); err != nil {
+		reactCtx, reactCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer reactCancel()
+		if _, err := client.SendMessage(reactCtx, chatJID, msg); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 			return
