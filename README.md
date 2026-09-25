@@ -1,9 +1,10 @@
 # WhatsApp Assistant
 
-A personal WhatsApp assistant that runs on your Mac through Claude Desktop. It
-reads only the chats you allow, gives you a structured morning briefing, tracks
-reminders and follow-ups, drafts replies (never sends without your say-so), and
-can be reconfigured entirely by talking to it.
+A personal WhatsApp assistant that runs on your own machine (macOS or
+Windows) through Claude Desktop. It reads only the chats you allow, gives
+you a structured morning briefing, tracks reminders and follow-ups, drafts
+replies (never sends without your say-so), and can be reconfigured entirely
+by talking to it.
 
 Built on top of [whatsapp-mcp](https://github.com/verygoodplugins/whatsapp-mcp)
 (vendored under `whatsapp-mcp/`), plus a Claude Desktop Project that turns the
@@ -48,10 +49,44 @@ raw tools into an end-to-end assistant.
 
 Design details: [`docs/superpowers/specs/2026-07-04-whatsapp-assistant-v2-design.md`](docs/superpowers/specs/2026-07-04-whatsapp-assistant-v2-design.md).
 
-## Setup
+## Quick start
 
-See [SETUP.md](SETUP.md) — clone, pair WhatsApp once (QR code), install the
-background service, point Claude Desktop at it, and create the Project.
+**Prerequisites:** Go 1.24+, Python 3.11+ with [`uv`](https://docs.astral.sh/uv/),
+Claude Desktop. **Windows also needs** a C compiler on `PATH` (e.g.
+[MSYS2](https://www.msys2.org/)'s `mingw-w64-x86_64-gcc`) — see
+[SETUP.md](SETUP.md#prerequisites) for why.
+
+```bash
+git clone <this-repo-url> && cd <this-repo>
+cd whatsapp-mcp/whatsapp-bridge && go run .   # scan the QR code with your phone, then Ctrl+C
+cd ..
+```
+
+Install the background service, then point Claude Desktop at the MCP server:
+
+| | macOS | Windows |
+|---|---|---|
+| Install auto-start | `./scripts/install-launchd-macos.sh` | `powershell -ExecutionPolicy Bypass -File scripts\install-windows.ps1` (**as Administrator**) |
+| Claude Desktop config | `~/Library/Application Support/Claude/claude_desktop_config.json` | `%APPDATA%\Claude\claude_desktop_config.json` |
+
+```json
+{
+  "mcpServers": {
+    "whatsapp": {
+      "command": "uv",
+      "args": ["--directory", "/absolute/path/to/whatsapp-mcp/whatsapp-mcp-server", "run", "main.py"]
+    }
+  }
+}
+```
+
+Restart Claude Desktop, ask it "list my WhatsApp chats" to confirm the
+connection, then create the Claude Desktop Project (SETUP.md steps 6-7)
+and say "set me up."
+
+**This is the condensed version — for the full walkthrough (pairing details,
+Project setup, autorun behavior, updating, and a troubleshooting table for
+both OSes covering the gotchas people actually hit), see [SETUP.md](SETUP.md).**
 
 ## Reconnecting the bridge
 
@@ -77,4 +112,4 @@ This uses WhatsApp tools with an AI, so mind the basics: it only reads chats you
 explicitly allow, treats message content as untrusted (won't act on instructions
 hidden inside messages), and never sends a message to anyone without your
 explicit confirmation of that exact draft. Your messages stay in a local SQLite
-database on your Mac; they're only sent to Claude when you ask for something.
+database on your own machine; they're only sent to Claude when you ask for something.
