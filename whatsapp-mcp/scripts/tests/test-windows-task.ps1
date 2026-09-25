@@ -177,6 +177,10 @@ function Test-InstallGeneratesTaskFiles {
     Assert-True $global:registeredTasks.ContainsKey('WhatsAppMCPBridgeMonitor') "expected WhatsAppMCPBridgeMonitor task registered"
     Assert-True ($global:registeredTasks['WhatsAppMCPBridge'].Execute -eq 'wscript.exe') "expected bridge task to launch via wscript.exe (hidden window), got $($global:registeredTasks['WhatsAppMCPBridge'].Execute)"
     Assert-True ($global:registeredTasks['WhatsAppMCPBridgeMonitor'].Execute -eq 'wscript.exe') "expected monitor task to launch via wscript.exe (hidden window), got $($global:registeredTasks['WhatsAppMCPBridgeMonitor'].Execute)"
+    # bWaitOnReturn must be True: if it were False, wscript.exe would launch
+    # powershell.exe and exit immediately, detaching the real process from
+    # Task Scheduler's tracking -- breaking stop/restart entirely.
+    Assert-Contains (Join-Path $support 'launch-hidden.vbs') '.Run "powershell.exe -NoProfile -ExecutionPolicy Bypass -File """ & scriptPath & """", 0, True'
     Assert-True (($global:cmdLog -join "`n") -match 'Start-ScheduledTask -TaskName WhatsAppMCPBridge') "expected bridge task to be started"
 
     Remove-Item -Recurse -Force $fixture.Root -ErrorAction SilentlyContinue

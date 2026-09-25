@@ -257,12 +257,23 @@ Set-Content -Path $MonitorScript -Value $monitorContent -Encoding UTF8
 # window still flashes (or on some builds, never hides at all). Launching
 # through a VBScript wrapper via wscript.exe suppresses the window at the
 # process-creation level instead, which is reliable.
+#
+# The trailing "True" makes WScript.Shell.Run BLOCK until the launched
+# process exits, so wscript.exe stays alive for exactly as long as the real
+# process does (the bridge, effectively forever; the monitor, a few
+# seconds). That keeps Task Scheduler's own tracked process matched to the
+# actual work's lifetime -- Stop-ScheduledTask/Unregister-ScheduledTask then
+# correctly stops/restarts it. Passing False here would let wscript.exe
+# launch the child and exit immediately, detaching the real process from
+# Task Scheduler's tracking entirely -- fine for the window, but it would
+# break the bridge task's whole reason for being a Scheduled Task in the
+# first place (auto-restart on crash, clean stop on uninstall/reconnect).
 $LauncherScript = Join-Path $SupportDir 'launch-hidden.vbs'
 $launcherContent = @'
 Set objArgs = WScript.Arguments
 scriptPath = objArgs(0)
 Set objShell = CreateObject("WScript.Shell")
-objShell.Run "powershell.exe -NoProfile -ExecutionPolicy Bypass -File """ & scriptPath & """", 0, False
+objShell.Run "powershell.exe -NoProfile -ExecutionPolicy Bypass -File """ & scriptPath & """", 0, True
 '@
 Set-Content -Path $LauncherScript -Value $launcherContent -Encoding ASCII
 
