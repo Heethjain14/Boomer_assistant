@@ -20,7 +20,11 @@ WHATSMEOW_DB_PATH = os.getenv(
     "WHATSMEOW_DB_PATH",
     os.path.join(_DEFAULT_BRIDGE_STORE_DIR, "whatsapp.db"),
 )
-WHATSAPP_API_BASE_URL = os.getenv("WHATSAPP_API_URL", "http://localhost:8080/api")
+WHATSAPP_API_BASE_URL = os.getenv("WHATSAPP_API_URL", "http://localhost:8090/api")
+# requests has no default timeout; without one, a stalled bridge (or a
+# send that's slow to get a WhatsApp-side ack) hangs this call forever,
+# surfacing to the caller only as a silent, multi-minute stall.
+BRIDGE_REQUEST_TIMEOUT_SECS = 35
 
 _BRIDGE_TOKEN_PATH = os.path.join(os.path.dirname(WHATSMEOW_DB_PATH), ".bridge-token")
 
@@ -1012,7 +1016,7 @@ def send_message(
             payload["quoted_sender_jid"] = quoted_sender_jid
             payload["quoted_content"] = quoted_content
 
-        response = requests.post(url, json=payload, headers=_bridge_headers())
+        response = requests.post(url, json=payload, headers=_bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT_SECS)
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -1044,7 +1048,7 @@ def send_file(recipient: str, media_path: str) -> tuple[bool, str]:
         url = f"{WHATSAPP_API_BASE_URL}/send"
         payload = {"recipient": recipient, "media_path": media_path}
 
-        response = requests.post(url, json=payload, headers=_bridge_headers())
+        response = requests.post(url, json=payload, headers=_bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT_SECS)
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -1082,7 +1086,7 @@ def send_audio_message(recipient: str, media_path: str) -> tuple[bool, str]:
         url = f"{WHATSAPP_API_BASE_URL}/send"
         payload = {"recipient": recipient, "media_path": media_path}
 
-        response = requests.post(url, json=payload, headers=_bridge_headers())
+        response = requests.post(url, json=payload, headers=_bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT_SECS)
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -1134,7 +1138,7 @@ def send_reaction(
             "sender_jid": sender_jid,
         }
 
-        response = requests.post(url, json=payload, headers=_bridge_headers())
+        response = requests.post(url, json=payload, headers=_bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT_SECS)
 
         if response.status_code == 200:
             result = response.json()
@@ -1166,7 +1170,7 @@ def download_media(message_id: str, chat_jid: str) -> str | None:
         url = f"{WHATSAPP_API_BASE_URL}/download"
         payload = {"message_id": message_id, "chat_jid": chat_jid}
 
-        response = requests.post(url, json=payload, headers=_bridge_headers())
+        response = requests.post(url, json=payload, headers=_bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT_SECS)
 
         if response.status_code == 200:
             result = response.json()

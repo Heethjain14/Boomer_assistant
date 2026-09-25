@@ -41,7 +41,7 @@ printf '%s\n' "$DIGEST"
 #
 # MY_NUMBER="9199XXXXXXXX"   # your own WhatsApp number, country code, no +
 # TOKEN="$(cat /Users/apple/Downloads/whatsapp/whatsapp-mcp/whatsapp-bridge/store/.bridge-token)"
-# curl -s -X POST http://localhost:8080/api/send \
+# curl -s -X POST http://localhost:8090/api/send \
 #   -H "Authorization: Bearer $TOKEN" \
 #   -H "Content-Type: application/json" \
 #   -d "$(python3 -c 'import json,sys; print(json.dumps({"recipient": sys.argv[1]+"@s.whatsapp.net", "message": sys.argv[2]}))' "$MY_NUMBER" "$DIGEST")"

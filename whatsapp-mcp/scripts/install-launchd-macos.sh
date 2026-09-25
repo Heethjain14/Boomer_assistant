@@ -52,7 +52,7 @@ BRIDGE_BINARY="$BRIDGE_DIR/whatsapp-bridge"
 
 [[ -d "$BRIDGE_DIR" ]] || fail "Could not find bridge directory: $BRIDGE_DIR"
 
-PORT="${WHATSAPP_BRIDGE_PORT:-8080}"
+PORT="${WHATSAPP_BRIDGE_PORT:-8090}"
 validate_port "$PORT"
 API_URL="${WHATSAPP_API_URL:-http://127.0.0.1:${PORT}/api}"
 
