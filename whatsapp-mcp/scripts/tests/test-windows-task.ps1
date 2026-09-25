@@ -170,10 +170,13 @@ function Test-InstallGeneratesTaskFiles {
     Assert-FileExists (Join-Path $support 'task.env.ps1')
     Assert-FileExists (Join-Path $support 'run-whatsapp-bridge.ps1')
     Assert-FileExists (Join-Path $support 'monitor-whatsapp-bridge.ps1')
+    Assert-FileExists (Join-Path $support 'launch-hidden.vbs')
     Assert-Contains (Join-Path $support 'task.env.ps1') "WHATSAPP_BRIDGE_PORT = '8090'"
     Assert-Contains (Join-Path $support 'task.env.ps1') "WHATSAPP_API_URL = 'http://127.0.0.1:8090/api'"
     Assert-True $global:registeredTasks.ContainsKey('WhatsAppMCPBridge') "expected WhatsAppMCPBridge task registered"
     Assert-True $global:registeredTasks.ContainsKey('WhatsAppMCPBridgeMonitor') "expected WhatsAppMCPBridgeMonitor task registered"
+    Assert-True ($global:registeredTasks['WhatsAppMCPBridge'].Execute -eq 'wscript.exe') "expected bridge task to launch via wscript.exe (hidden window), got $($global:registeredTasks['WhatsAppMCPBridge'].Execute)"
+    Assert-True ($global:registeredTasks['WhatsAppMCPBridgeMonitor'].Execute -eq 'wscript.exe') "expected monitor task to launch via wscript.exe (hidden window), got $($global:registeredTasks['WhatsAppMCPBridgeMonitor'].Execute)"
     Assert-True (($global:cmdLog -join "`n") -match 'Start-ScheduledTask -TaskName WhatsAppMCPBridge') "expected bridge task to be started"
 
     Remove-Item -Recurse -Force $fixture.Root -ErrorAction SilentlyContinue
@@ -217,6 +220,7 @@ function Test-InstallRespectsSupportDirOverride {
 
     Assert-FileExists (Join-Path $overrideDir 'task.env.ps1')
     Assert-FileExists (Join-Path $overrideDir 'run-whatsapp-bridge.ps1')
+    Assert-FileExists (Join-Path $overrideDir 'launch-hidden.vbs')
     Assert-NotExists (Join-Path $fixture.LocalAppData 'whatsapp-mcp')
 
     Remove-Item -Recurse -Force $fixture.Root -ErrorAction SilentlyContinue
@@ -236,6 +240,7 @@ function Test-UninstallRemovesGeneratedFilesOnly {
     Assert-NotExists (Join-Path $support 'task.env.ps1')
     Assert-NotExists (Join-Path $support 'run-whatsapp-bridge.ps1')
     Assert-NotExists (Join-Path $support 'monitor-whatsapp-bridge.ps1')
+    Assert-NotExists (Join-Path $support 'launch-hidden.vbs')
     Assert-NotExists (Join-Path $support 'state')
     Assert-FileExists (Join-Path $fixture.Repo 'whatsapp-bridge\store\messages.db')
     Assert-True (-not $global:registeredTasks.ContainsKey('WhatsAppMCPBridge')) "expected bridge task removed"

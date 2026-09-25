@@ -251,6 +251,21 @@ if ($connected) {
 $monitorContent = $monitorTemplate.Replace('__ENV_FILE__', $EnvFile).Replace('__BRIDGE_TASK_NAME__', $BridgeTaskName)
 Set-Content -Path $MonitorScript -Value $monitorContent -Encoding UTF8
 
+# --- hidden-window launcher -------------------------------------------------
+# powershell.exe's own -WindowStyle Hidden is unreliable from Task Scheduler:
+# conhost.exe allocates a console window before PowerShell can hide it, so a
+# window still flashes (or on some builds, never hides at all). Launching
+# through a VBScript wrapper via wscript.exe suppresses the window at the
+# process-creation level instead, which is reliable.
+$LauncherScript = Join-Path $SupportDir 'launch-hidden.vbs'
+$launcherContent = @'
+Set objArgs = WScript.Arguments
+scriptPath = objArgs(0)
+Set objShell = CreateObject("WScript.Shell")
+objShell.Run "powershell.exe -NoProfile -ExecutionPolicy Bypass -File """ & scriptPath & """", 0, False
+'@
+Set-Content -Path $LauncherScript -Value $launcherContent -Encoding ASCII
+
 # --- register scheduled tasks ---------------------------------------------
 $settings = New-ScheduledTaskSettingsSet `
     -RestartCount 999 `
@@ -262,16 +277,16 @@ $settings = New-ScheduledTaskSettingsSet `
 
 $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
 
-$bridgeAction = New-ScheduledTaskAction -Execute 'powershell.exe' `
-    -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$RunnerScript`""
+$bridgeAction = New-ScheduledTaskAction -Execute 'wscript.exe' `
+    -Argument "`"$LauncherScript`" `"$RunnerScript`""
 $bridgeTrigger = New-ScheduledTaskTrigger -AtLogOn
 
 Register-ScheduledTask -TaskName $BridgeTaskName -Action $bridgeAction -Trigger $bridgeTrigger `
     -Settings $settings -Principal $principal -Force | Out-Null
 Start-ScheduledTask -TaskName $BridgeTaskName
 
-$monitorAction = New-ScheduledTaskAction -Execute 'powershell.exe' `
-    -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$MonitorScript`""
+$monitorAction = New-ScheduledTaskAction -Execute 'wscript.exe' `
+    -Argument "`"$LauncherScript`" `"$MonitorScript`""
 $monitorTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date) `
     -RepetitionInterval (New-TimeSpan -Seconds 60) -RepetitionDuration (New-TimeSpan -Days 3650)
 

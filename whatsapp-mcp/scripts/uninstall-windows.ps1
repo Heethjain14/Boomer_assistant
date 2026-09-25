@@ -44,6 +44,7 @@ foreach ($name in @($MonitorTaskName, $BridgeTaskName)) {
 
 Remove-Item -Path (Join-Path $SupportDir 'run-whatsapp-bridge.ps1') -Force -ErrorAction SilentlyContinue
 Remove-Item -Path (Join-Path $SupportDir 'monitor-whatsapp-bridge.ps1') -Force -ErrorAction SilentlyContinue
+Remove-Item -Path (Join-Path $SupportDir 'launch-hidden.vbs') -Force -ErrorAction SilentlyContinue
 Remove-Item -Path (Join-Path $SupportDir 'task.env.ps1') -Force -ErrorAction SilentlyContinue
 Remove-Item -Path $StateDir -Recurse -Force -ErrorAction SilentlyContinue
 
