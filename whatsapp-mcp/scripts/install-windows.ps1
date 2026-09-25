@@ -50,11 +50,14 @@ if ($Port -notmatch '^[0-9]+$' -or [int]$Port -lt 1 -or [int]$Port -gt 65535) {
 }
 $ApiUrl = if ($env:WHATSAPP_API_URL) { $env:WHATSAPP_API_URL } else { "http://127.0.0.1:$Port/api" }
 
-if (-not $env:LOCALAPPDATA) {
-    Fail "LOCALAPPDATA is not set; cannot determine where to install support files."
+if (-not $env:WHATSAPP_MCP_SUPPORT_DIR -and -not $env:LOCALAPPDATA) {
+    Fail "LOCALAPPDATA is not set; cannot determine where to install support files. Set WHATSAPP_MCP_SUPPORT_DIR to an explicit path instead."
 }
 
-$SupportDir = Join-Path $env:LOCALAPPDATA 'whatsapp-mcp'
+# Config/state/log files live here. Small (KBs) -- defaults to %LOCALAPPDATA%,
+# but WHATSAPP_MCP_SUPPORT_DIR lets you redirect them (e.g. to a drive other
+# than C: if it's low on space).
+$SupportDir = if ($env:WHATSAPP_MCP_SUPPORT_DIR) { $env:WHATSAPP_MCP_SUPPORT_DIR } else { Join-Path $env:LOCALAPPDATA 'whatsapp-mcp' }
 $StateDir = Join-Path $SupportDir 'state'
 $LogDir = Join-Path $SupportDir 'logs'
 $EnvFile = Join-Path $SupportDir 'task.env.ps1'

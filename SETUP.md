@@ -159,8 +159,10 @@ it'll give you the right command for your OS.
 ## Windows setup
 
 Windows equivalents of the macOS-only pieces in steps 3 and above. Run
-these from PowerShell (not needed to run as Administrator — these install
-per-user Scheduled Tasks, not services).
+these from PowerShell **as Administrator** — the tasks themselves run as
+your regular user account day-to-day, but *registering* a Scheduled Task
+(`Register-ScheduledTask`) requires an elevated PowerShell session
+regardless of what privilege level the task runs at once triggered.
 
 **Install the bridge as a background task** (equivalent of step 3):
 ```powershell
@@ -176,6 +178,18 @@ writes a small env file and two generated runner scripts under
   module is installed) when the bridge is down, unreachable, or needs
   re-linking
 
+These support files (env/runner scripts, state markers, logs) are tiny
+(KBs) and default to `%LOCALAPPDATA%` (on your `C:` drive). If `C:` is low
+on space, redirect them elsewhere with `WHATSAPP_MCP_SUPPORT_DIR` (set it
+before running both the installer and uninstaller, so they agree on where
+to look):
+```powershell
+$env:WHATSAPP_MCP_SUPPORT_DIR = "F:\path\to\whatsapp-mcp-support"
+powershell -ExecutionPolicy Bypass -File scripts\install-windows.ps1
+```
+This only affects config/logs — your actual chat data always lives under
+`whatsapp-bridge\store\` inside the repo itself, wherever you cloned it.
+
 To remove both later:
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\uninstall-windows.ps1
@@ -186,6 +200,7 @@ Verify:
 Get-ScheduledTask -TaskName WhatsAppMCPBridge, WhatsAppMCPBridgeMonitor   # both should show State: Running/Ready
 Get-Content "$env:LOCALAPPDATA\whatsapp-mcp\logs\bridge.out.log" -Tail 20   # should show connected/ready, no crash loop
 ```
+(Substitute `$env:WHATSAPP_MCP_SUPPORT_DIR` for `$env:LOCALAPPDATA\whatsapp-mcp` above if you set the override.)
 
 **Reconnecting the bridge** (equivalent of `reconnect-bridge.sh`):
 ```powershell

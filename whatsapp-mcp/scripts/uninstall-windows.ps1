@@ -24,11 +24,13 @@ if ($env:OS -ne 'Windows_NT') {
 $BridgeTaskName = 'WhatsAppMCPBridge'
 $MonitorTaskName = 'WhatsAppMCPBridgeMonitor'
 
-if (-not $env:LOCALAPPDATA) {
-    Fail "LOCALAPPDATA is not set; cannot determine where support files live."
+if (-not $env:WHATSAPP_MCP_SUPPORT_DIR -and -not $env:LOCALAPPDATA) {
+    Fail "LOCALAPPDATA is not set; cannot determine where support files live. Set WHATSAPP_MCP_SUPPORT_DIR to the same path passed to install-windows.ps1."
 }
 
-$SupportDir = Join-Path $env:LOCALAPPDATA 'whatsapp-mcp'
+# Must match whatever install-windows.ps1 used (its own default, or your
+# WHATSAPP_MCP_SUPPORT_DIR override), or this won't find the files to remove.
+$SupportDir = if ($env:WHATSAPP_MCP_SUPPORT_DIR) { $env:WHATSAPP_MCP_SUPPORT_DIR } else { Join-Path $env:LOCALAPPDATA 'whatsapp-mcp' }
 $StateDir = Join-Path $SupportDir 'state'
 
 Write-Host "Stopping whatsapp-mcp scheduled tasks if present..."

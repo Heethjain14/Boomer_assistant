@@ -202,6 +202,26 @@ function Test-InstallPreservesOptionalEnvValues {
     Remove-Item -Recurse -Force $fixture.Root -ErrorAction SilentlyContinue
 }
 
+function Test-InstallRespectsSupportDirOverride {
+    $global:registeredTasks = @{}
+    $global:cmdLog.Clear()
+    $fixture = New-Fixture
+    $overrideDir = Join-Path $fixture.Root 'custom-support-dir'
+    $oldSupportDir = $env:WHATSAPP_MCP_SUPPORT_DIR
+    try {
+        $env:WHATSAPP_MCP_SUPPORT_DIR = $overrideDir
+        Invoke-Install $fixture
+    } finally {
+        $env:WHATSAPP_MCP_SUPPORT_DIR = $oldSupportDir
+    }
+
+    Assert-FileExists (Join-Path $overrideDir 'task.env.ps1')
+    Assert-FileExists (Join-Path $overrideDir 'run-whatsapp-bridge.ps1')
+    Assert-NotExists (Join-Path $fixture.LocalAppData 'whatsapp-mcp')
+
+    Remove-Item -Recurse -Force $fixture.Root -ErrorAction SilentlyContinue
+}
+
 function Test-UninstallRemovesGeneratedFilesOnly {
     $global:registeredTasks = @{}
     $global:cmdLog.Clear()
@@ -228,6 +248,8 @@ Write-Host "Running Test-InstallGeneratesTaskFiles"
 Test-InstallGeneratesTaskFiles
 Write-Host "Running Test-InstallPreservesOptionalEnvValues"
 Test-InstallPreservesOptionalEnvValues
+Write-Host "Running Test-InstallRespectsSupportDirOverride"
+Test-InstallRespectsSupportDirOverride
 Write-Host "Running Test-UninstallRemovesGeneratedFilesOnly"
 Test-UninstallRemovesGeneratedFilesOnly
 
