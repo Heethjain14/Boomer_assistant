@@ -44,7 +44,7 @@ if (-not (Test-Path $BridgeDir)) {
     Fail "Could not find bridge directory: $BridgeDir"
 }
 
-$Port = if ($env:WHATSAPP_BRIDGE_PORT) { $env:WHATSAPP_BRIDGE_PORT } else { '8080' }
+$Port = if ($env:WHATSAPP_BRIDGE_PORT) { $env:WHATSAPP_BRIDGE_PORT } else { '8090' }
 if ($Port -notmatch '^[0-9]+$' -or [int]$Port -lt 1 -or [int]$Port -gt 65535) {
     Fail "WHATSAPP_BRIDGE_PORT must be a number between 1 and 65535, got: $Port"
 }

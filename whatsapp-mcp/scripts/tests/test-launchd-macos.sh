@@ -97,7 +97,7 @@ EOF
 #!/bin/sh
 printf 'lsof %s\n' "$*" >> "$FAKE_CMD_LOG"
 if [ "${FAKE_LSOF_BUSY:-0}" = "1" ]; then
-  printf 'whatsapp 123 user 10u IPv4 TCP 127.0.0.1:8080 (LISTEN)\n'
+  printf 'whatsapp 123 user 10u IPv4 TCP 127.0.0.1:8090 (LISTEN)\n'
   exit 0
 fi
 exit 1
@@ -183,8 +183,8 @@ test_install_generates_launchd_files() {
   assert_file "$launch_agents/com.whatsapp-mcp.bridge.plist"
   assert_file "$launch_agents/com.whatsapp-mcp.bridge-monitor.plist"
 
-  assert_contains "$support/launchd.env" "export WHATSAPP_BRIDGE_PORT='8080'"
-  assert_contains "$support/launchd.env" "export WHATSAPP_API_URL='http://127.0.0.1:8080/api'"
+  assert_contains "$support/launchd.env" "export WHATSAPP_BRIDGE_PORT='8090'"
+  assert_contains "$support/launchd.env" "export WHATSAPP_API_URL='http://127.0.0.1:8090/api'"
   assert_contains "$support/launchd.env" "export WHATSAPP_MCP_REPO_ROOT='$repo'"
   assert_contains "$support/launchd.env" "export WHATSAPP_BRIDGE_DIR='$repo/whatsapp-bridge'"
   assert_contains "$support/launchd.env" "export WHATSAPP_BRIDGE_BINARY='$repo/whatsapp-bridge/whatsapp-bridge'"

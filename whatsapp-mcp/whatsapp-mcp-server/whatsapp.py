@@ -20,7 +20,7 @@ WHATSMEOW_DB_PATH = os.getenv(
     "WHATSMEOW_DB_PATH",
     os.path.join(_DEFAULT_BRIDGE_STORE_DIR, "whatsapp.db"),
 )
-WHATSAPP_API_BASE_URL = os.getenv("WHATSAPP_API_URL", "http://localhost:8080/api")
+WHATSAPP_API_BASE_URL = os.getenv("WHATSAPP_API_URL", "http://localhost:8090/api")
 # requests has no default timeout; without one, a stalled bridge (or a
 # send that's slow to get a WhatsApp-side ack) hangs this call forever,
 # surfacing to the caller only as a silent, multi-minute stall.

@@ -329,12 +329,12 @@ Copy `.env.example` to `.env` and configure as needed:
 
 | Variable               | Default                                  | Description                                  |
 | ---------------------- | ---------------------------------------- | -------------------------------------------- |
-| `WHATSAPP_BRIDGE_PORT` | `8080`                                   | Port for Go bridge REST API                  |
+| `WHATSAPP_BRIDGE_PORT` | `8090`                                   | Port for Go bridge REST API                  |
 | `WEBHOOK_URL`          | `http://localhost:8769/whatsapp/webhook` | Webhook for incoming messages                |
 | `FORWARD_SELF`         | `true`                                   | Forward messages sent by self                |
 | `WHATSAPP_DB_PATH`     | `../whatsapp-bridge/store/messages.db`   | Path to SQLite database                      |
 | `WHATSMEOW_DB_PATH`    | `../whatsapp-bridge/store/whatsapp.db`   | whatsmeow DB used for LID ↔ phone resolution |
-| `WHATSAPP_API_URL`     | `http://localhost:8080/api`              | Go bridge REST API URL                       |
+| `WHATSAPP_API_URL`     | `http://localhost:8090/api`              | Go bridge REST API URL                       |
 | `WHATSAPP_BRIDGE_TOKEN` | generated next to `WHATSMEOW_DB_PATH` as `.bridge-token` | Bearer token required for bridge REST calls |
 | `WHATSAPP_MEDIA_ROOTS` | `~/.local/share/whatsapp-mcp/outbox`     | Path-list of directories allowed for outbound media files |
 | `WHATSAPP_MCP_TRANSPORT` | `stdio`                                | MCP transport to serve clients: `stdio`, `http`, or `sse` |
@@ -407,7 +407,7 @@ To customize the launchd environment, export values before running the installer
 Re-run the installer after changing them.
 
 ```bash
-export WHATSAPP_BRIDGE_PORT=8080
+export WHATSAPP_BRIDGE_PORT=8090
 export WEBHOOK_URL=http://localhost:8769/whatsapp/webhook
 export FORWARD_SELF=false
 export WHATSAPP_MEDIA_ROOTS="$HOME/.local/share/whatsapp-mcp/outbox"

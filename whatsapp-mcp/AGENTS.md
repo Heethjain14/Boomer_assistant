@@ -28,7 +28,7 @@ whatsapp-mcp/
 └── .github/                # CI, release, security workflows
 ```
 
-Data flow: AI client → MCP server (Python) → reads SQLite directly **or** calls bridge REST (`http://localhost:8080/api/*` by default; configurable via `WHATSAPP_API_URL` and `WHATSAPP_BRIDGE_PORT`) → bridge (Go) → WhatsApp Web.
+Data flow: AI client → MCP server (Python) → reads SQLite directly **or** calls bridge REST (`http://localhost:8090/api/*` by default; configurable via `WHATSAPP_API_URL` and `WHATSAPP_BRIDGE_PORT`) → bridge (Go) → WhatsApp Web.
 
 Two SQLite databases:
 
@@ -98,8 +98,8 @@ A failing blocking job is a hard block — fix it or explain in the PR why it's 
 |----------|---------|---------|
 | `WHATSAPP_DB_PATH` | `../whatsapp-bridge/store/messages.db` | SQLite path used by the MCP server |
 | `WHATSMEOW_DB_PATH` | `../whatsapp-bridge/store/whatsapp.db` | whatsmeow SQLite (LID ↔ phone resolution via `whatsmeow_lid_map`) |
-| `WHATSAPP_API_URL` | `http://localhost:8080/api` | Bridge REST endpoint |
-| `WHATSAPP_BRIDGE_PORT` | `8080` | Port the bridge binds to |
+| `WHATSAPP_API_URL` | `http://localhost:8090/api` | Bridge REST endpoint |
+| `WHATSAPP_BRIDGE_PORT` | `8090` | Port the bridge binds to |
 | `WHATSAPP_BRIDGE_TOKEN` | generated next to `WHATSMEOW_DB_PATH` as `.bridge-token` | Bearer token required for bridge REST calls |
 | `WHATSAPP_MEDIA_ROOTS` | `~/.local/share/whatsapp-mcp/outbox` | Path-list of directories allowed for outbound media files |
 | `WHATSAPP_MCP_TRANSPORT` | `stdio` | MCP transport to serve clients: `stdio`, `http`, or `sse` |

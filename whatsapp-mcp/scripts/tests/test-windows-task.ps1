@@ -170,8 +170,8 @@ function Test-InstallGeneratesTaskFiles {
     Assert-FileExists (Join-Path $support 'task.env.ps1')
     Assert-FileExists (Join-Path $support 'run-whatsapp-bridge.ps1')
     Assert-FileExists (Join-Path $support 'monitor-whatsapp-bridge.ps1')
-    Assert-Contains (Join-Path $support 'task.env.ps1') "WHATSAPP_BRIDGE_PORT = '8080'"
-    Assert-Contains (Join-Path $support 'task.env.ps1') "WHATSAPP_API_URL = 'http://127.0.0.1:8080/api'"
+    Assert-Contains (Join-Path $support 'task.env.ps1') "WHATSAPP_BRIDGE_PORT = '8090'"
+    Assert-Contains (Join-Path $support 'task.env.ps1') "WHATSAPP_API_URL = 'http://127.0.0.1:8090/api'"
     Assert-True $global:registeredTasks.ContainsKey('WhatsAppMCPBridge') "expected WhatsAppMCPBridge task registered"
     Assert-True $global:registeredTasks.ContainsKey('WhatsAppMCPBridgeMonitor') "expected WhatsAppMCPBridgeMonitor task registered"
     Assert-True (($global:cmdLog -join "`n") -match 'Start-ScheduledTask -TaskName WhatsAppMCPBridge') "expected bridge task to be started"

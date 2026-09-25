@@ -2565,7 +2565,7 @@ connectionSuccess:
 	fmt.Println("\n✓ Connected to WhatsApp! Type 'help' for commands.")
 
 	// Start REST API server
-	port := 8080
+	port := 8090
 	if p := os.Getenv("WHATSAPP_BRIDGE_PORT"); p != "" {
 		v, err := strconv.Atoi(p)
 		if err != nil || v < 1 || v > 65535 {

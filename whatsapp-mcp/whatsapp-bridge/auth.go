@@ -131,7 +131,7 @@ func withAuth(token string, allowedHosts map[string]struct{}, h http.HandlerFunc
 
 // hostAllowed performs an exact, case-insensitive match against the
 // allow-list. r.Host already includes the port for non-default ports, which
-// is exactly what we want — listening on :8080 means "localhost" without a
+// is exactly what we want — listening on :8090 means "localhost" without a
 // port should not match.
 func hostAllowed(host string, allowed map[string]struct{}) bool {
 	h := strings.ToLower(strings.TrimSpace(host))
