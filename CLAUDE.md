@@ -10,3 +10,10 @@ awkward for a personal project where branches get cleaned up regularly.
 Use short, plain, descriptive names instead — e.g. `windows-support`,
 `fix-send-timeout`, `docs-update`. If work needs its own branch, ask what to
 call it rather than defaulting to an auto-generated `claude/...` name.
+
+## No AI attribution in commits/PRs
+
+This is a personal project — don't add `Co-Authored-By: Claude ...` trailers
+to commit messages, and don't add a "Generated with Claude Code" (or
+similar) footer to PR descriptions or commit messages. Keep PR descriptions
+concise: a short summary and a test plan, no more than that calls for.
