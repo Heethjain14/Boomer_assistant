@@ -228,6 +228,16 @@ service from `whatsapp-mcp/`:
 powershell -File scripts\install-windows.ps1   # Windows
 ```
 
+> **Existing macOS installs: re-run the installer after pulling.** The
+> default bridge port changed from 8080 to 8090. The macOS installer saves
+> the port into `~/Library/Application Support/whatsapp-mcp/launchd.env`
+> at install time, so a Mac installed before the change keeps running the
+> bridge on 8080 while the updated MCP server looks for it on 8090 — Claude
+> Desktop then can't reach the WhatsApp tools. Re-running
+> `./scripts/install-launchd-macos.sh` regenerates that file with 8090.
+> (If you deliberately set `WHATSAPP_BRIDGE_PORT` yourself, you're
+> unaffected.)
+
 ## Troubleshooting
 
 **macOS:**
@@ -237,6 +247,7 @@ powershell -File scripts\install-windows.ps1   # Windows
 | Claude Desktop says it can't reach WhatsApp tools | `launchctl list \| grep com.whatsapp-mcp` — is `com.whatsapp-mcp.bridge` running? |
 | Bridge keeps restarting in a loop | `tail -50 ~/Library/Logs/whatsapp-mcp/bridge.err.log` |
 | Bridge down or needs re-linking | Check for a macOS notification from the monitor job, or `tail ~/Library/Logs/whatsapp-mcp/monitor.err.log` |
+| Tools stopped working right after pulling an update | `grep PORT ~/Library/Application\ Support/whatsapp-mcp/launchd.env` — if it says 8080, re-run `./scripts/install-launchd-macos.sh` (see "Updating"). |
 | QR code needed again | Usually means the paired session was invalidated on the phone side (device unlinked). Run step 2 again. |
 | Chats missing from a Digest | Check they're on the "Allowed chats" list, and not muted/snoozed in the reminders file |
 | Assistant forgot my settings | The knowledge files only update when you paste the assistant's new version back in — check you did that after the last change |
